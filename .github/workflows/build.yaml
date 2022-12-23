@@ -1,0 +1,30 @@
+name: build
+on:
+  release:
+    types: [published]
+
+env:
+  IMAGE_NAME: mnv-container
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'write'
+      id-token: 'write'
+
+    steps:
+    - uses: 'actions/checkout@v3'
+    - name: commit
+      run: |
+        git config --global user.name 'Github Action'
+        git config --global user.email 'vindex10@gmail.com'
+        git checkout -b tmp
+        tag=${{ github.ref_name }}-build`date +"%Y%m%dT%H%M"`
+        echo $tag >> VERSION
+        git add VERSION
+        git commit -m "release"
+        git tag $tag
+        #git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+        git push origin --tags
