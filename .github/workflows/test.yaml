@@ -1,0 +1,37 @@
+name: run-tests
+on:
+  push:
+    branches: [ main ]
+  pull_request_target:
+    branches: [ main ]
+
+env:
+  DEPENDABOT_PERMIT_LABEL: "allow-tests"
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - name: test-it
+      run: |
+        echo "Repo from: ${{ github.event.pull_request.head.repo.full_name }}"
+        echo "Repo to: ${{ github.repository.full_name }}"
+
+    - name: is-external
+      if: (github.event_name == 'pull_request_target') && (github.event.pull_request.head.repo.full_name != github.repository.full_name)
+      run: |
+        echo "Repo from: ${{ github.event.pull_request.head.repo.full_name }}"
+        echo "Repo to: ${{ github.repository.full_name }}"
+        echo "External pull requests are not allowed. Fail."
+        exit 1
+
+    - name: has-allowed-label
+      if: (! contains( github.event.pull_request.labels.*.name, env.DEPENDABOT_PERMIT_LABEL))
+      run: |
+        echo "Add label ${{ env.DEPENDABOT_PERMIT_LABEL }} and reopen to allow tests for this PR. Fail for now."
+        exit 1
