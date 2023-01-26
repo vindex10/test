@@ -20,13 +20,13 @@ jobs:
     - name: test-it
       run: |
         echo "Repo from: ${{ github.event.pull_request.head.repo.full_name }}"
-        echo "Repo to: ${{ github.repository.full_name }}"
+        echo "Repo to: ${{ github.repository }}"
 
     - name: is-external
-      if: (github.event_name == 'pull_request_target') && (github.event.pull_request.head.repo.full_name != github.repository.full_name)
+      if: (github.event_name == 'pull_request_target') && (github.event.pull_request.head.repo.full_name != github.repository)
       run: |
         echo "Repo from: ${{ github.event.pull_request.head.repo.full_name }}"
-        echo "Repo to: ${{ github.repository.full_name }}"
+        echo "Repo to: ${{ github.repository }}"
         echo "External pull requests are not allowed. Fail."
         exit 1
 
